@@ -1,0 +1,29 @@
+version: '3.8'
+
+services:
+  spring-boot-app:
+    image: adoptopenjdk/openjdk17:alpine-jre
+    container_name: library-system-app
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./target/*.jar:/app/app.jar
+    command: ["java", "-jar", "/app/app.jar"]
+    depends_on:
+      - h2-database
+    environment:
+      SPRING_DATASOURCE_URL: "jdbc:h2:tcp://h2-database:1521/mem:testdb"
+      SPRING_DATASOURCE_USERNAME: "sa"
+      SPRING_DATASOURCE_PASSWORD: "password"
+      SPRING_H2_CONSOLE_ENABLED: "true"
+
+  h2-database:
+    image: "alpine/h2:latest"
+    container_name: h2-database
+    ports:
+      - "1521:1521"
+      - "81:81"
+    volumes:
+      - ./data:/data
+    environment:
+      H2_OPTIONS: '-ifNotExists'
